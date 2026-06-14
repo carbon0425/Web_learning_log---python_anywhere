@@ -1,0 +1,10 @@
+{% extends "learning_logs_app/base.html" %}
+{% load bootstrap4 %}
+
+{% block page_header %}
+  <div class="jumbotron">
+    <h2 class="display-3">You have been logged out.</h2>
+    <h3 class="lead">Thank you for using Learning Log. We hope to see you again soon!</h3>
+    <a class="btn btn-secondary btn-lg" href="{% url 'user_app:login' %}" role="button">Log in again&raquo;</a>
+  </div>
+{% endblock page_header %}

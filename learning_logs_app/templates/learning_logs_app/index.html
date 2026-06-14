@@ -1,0 +1,26 @@
+{% extends "learning_logs_app/base.html" %}
+
+{% block page_header %}
+  <div class="jumbotron">
+    <h1 class="display-3">Track Your Learning.</h1>
+   
+    <h2 class="lead">
+     Welcome to Learning Log, your personal space for tracking and reflecting on your learning journey.
+     Here, you can create topics, record entries, and build a meaningful log of your progress over time.
+     We designed this tool to be simple and focused, helping you stay organized and motivated.
+     Start by exploring topics or creating your own to capture what you're learning!
+    </h2>
+   
+    {% if not user.is_authenticated %}
+      <h4>Get started by creating an account or logging in.</h4>
+      <a class="btn btn-secondary btn-lg" href="{% url 'user_app:register' %}"
+         role="button">Register &raquo;</a>
+      <a class="btn btn-secondary btn-lg" href="{% url 'user_app:login' %}"
+         role="button">Log in &raquo;</a>
+    {% else %}
+      <h4>View your topics and entries to continue learning!</h4>
+      <a class="btn btn-secondary btn-lg" href="{% url 'learning_logs_app:topics' %}"
+         role="button">Your Topics &raquo;</a>
+    {% endif %}
+  </div>
+{% endblock page_header %}

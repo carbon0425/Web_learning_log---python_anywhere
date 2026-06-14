@@ -1,0 +1,22 @@
+{% extends 'learning_logs_app/base.html' %}
+{% load bootstrap4 %}
+
+{% block page_header %}
+  <h2>{{ user }}'s Topics</h2>
+{% endblock page_header %}
+
+{% block content %}
+  {% if topics %}
+    <ul class="navbar-nav ml-auto">
+      {% for topic in topics %}
+        <li><h3>
+          <a class="nav-link" href="{% url 'learning_logs_app:topic' topic.id %}">{{ topic }}</a>
+        </h3></li>
+      {% endfor %}
+    </ul>
+    <a class="btn btn-secondary mt-3" href="{% url 'learning_logs_app:new_topic' %}">Add New Topic &raquo;</a>
+  {% else %}
+    <h4>You have no topics yet. <a href="{% url 'learning_logs_app:new_topic' %}">Add a new topic</a> to get
+      started!</h4>
+  {% endif %}
+{% endblock content %}

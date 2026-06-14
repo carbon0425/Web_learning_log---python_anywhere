@@ -1,0 +1,38 @@
+{% extends "learning_logs_app/base.html" %}
+
+{% load bootstrap4 %}
+
+{% block page_header %}
+  <h2>{{ topic }}  on  {{ create_time|date:"M d, Y H:i" }}
+    <small class="text-muted">{{ quantity }} entries recording below the topic.</small>
+    <small class="text-muted">
+      <a href="{% url 'learning_logs_app:delete_topic' topic.id %}">Delete</a>
+    </small>
+  </h2>
+
+{% endblock page_header %}
+
+{% block content %}
+   <h6><a class="nav-link" href="{% url 'learning_logs_app:new_entry' topic.id %}">Add New Entry &raquo;</a></h6>
+  {% if entries %}
+    {% for entry in entries %}
+      <div class="card mb-3">
+        <nav>
+          <h4 class="card-header">{{ entry.date_added|date:"M d, Y H:i" }}
+            <small class="text-muted">
+              <a href="{% url 'learning_logs_app:edit_entry' entry.id %}">Edit Entry &raquo;</a>
+            </small>
+            <small class="text-muted">
+              <a class="navbar-brand" href="{% url 'learning_logs_app:delete_entry' entry.id %}">Delete</a>
+            </small>
+          </h4>
+        </nav>
+        <div class="card-body">
+          <p class="card-text">{{ entry.text|linebreaks }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <h4>No entries for this topic yet. <a href="{% url 'learning_logs_app:new_entry' topic.id %}">Add your first entry</a>!</h4>
+  {% endif %}
+{% endblock content %}

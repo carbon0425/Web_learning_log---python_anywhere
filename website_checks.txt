@@ -1,0 +1,60 @@
+删除操作权限检查
+
+文件：learning_logs_app/views.py
+在 delete_entry 中添加 if entry.topic.owner != request.user: raise Http404
+在 delete_topic 中添加 if topic.owner != request.user: raise Http404
+使用 get_object_or_404 处理不存在对象
+
+文件：learning_logs_app/views.py
+将所有 Model.objects.get(id=...) 替换为 get_object_or_404(Model, id=...)（需导入 from django.shortcuts import get_object_or_404）
+受影响视图：topic, new_entry, edit_entry, delete_entry, delete_topic
+隐藏 SECRET_KEY 到环境变量
+
+文件：learning_logs_settings/settings.py
+安装 python-decouple，在 settings.py 中改为 SECRET_KEY = config('SECRET_KEY')
+在项目根目录创建 .env 文件，写入 SECRET_KEY=你的密钥
+优化条目数量计算
+
+文件：learning_logs_app/views.py 中的 topic 视图
+将 quantity = len(entries) 改为 quantity = entries.count()
+移除无用注释和变量名前缀
+
+文件：learning_logs_app/views.py
+移除 delete_entry 和 delete_topic 上方的 # noinspection PyUnusedLocal
+将 _new_entry 重命名为 new_entry（new_entry 视图中）
+硬编码 URL 替换为 reverse
+
+文件：user_app/views.py 中的 register 视图
+将 return redirect("/") 改为 return redirect("learning_logs_app:index")
+删除链接样式调整
+
+文件：learning_logs_app/templates/learning_logs_app/topic.html
+将 <a class="navbar-brand" href="...">Delete</a> 改为普通链接 <a href="...">Delete Topic</a>
+添加删除确认弹窗
+
+文件：learning_logs_app/templates/learning_logs_app/topic.html
+为删除链接添加 onclick="return confirm('Are you sure?');"
+生成 requirements.txt
+在项目根目录执行 pip freeze > requirements.txt，确保包含 Django 和 django-bootstrap4
+
+
+配置静态文件收集目录
+
+
+文件：learning_logs_settings/settings.py
+添加 STATIC_ROOT = BASE_DIR / 'staticfiles'
+区分开发与生产设置（可选）
+建议创建 settings/ 目录，拆分 base.py, development.py, production.py，并通过环境变量加载
+添加基本单元测试
+
+文件：learning_logs_app/tests.py
+编写测试用例，至少验证主题只能被所有者访问（例如使用 TestCase 模拟登录和请求）
+
+
+部署前准备
+
+
+设置 DEBUG = False
+在 ALLOWED_HOSTS 中添加你的域名（如 ['yourdomain.com']）
+使用 PostgreSQL 等生产级数据库（可选）
+确保 HTTPS 配置（大多数平台自动处理）
