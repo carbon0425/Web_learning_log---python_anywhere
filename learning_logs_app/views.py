@@ -14,7 +14,6 @@ def index(request):
 # noinspection PyUnusedLocal
 @login_required
 def topics(request):
-    raise Exception
     """The page that show all topics."""
     topics = Topic.objects.filter(owner=request.user).order_by('date_added')
     context = {'topics': topics, 'user': request.user}
