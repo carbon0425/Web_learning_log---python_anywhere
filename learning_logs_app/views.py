@@ -1,16 +1,20 @@
-from django.shortcuts import render,redirect
-from .models import Topic, Entry
+from django.shortcuts import render, redirect
+from .models import Topic, Entry, ErrorLog
 from .forms import TopicForm, EntryForm
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+import sys
+import traceback
 
 def index(request):
     """The home page for Learning Logs."""
     return render(request, 'learning_logs_app/index.html')
 
+# noinspection PyUnusedLocal
 @login_required
 def topics(request):
+    raise Exception
     """The page that show all topics."""
     topics = Topic.objects.filter(owner=request.user).order_by('date_added')
     context = {'topics': topics, 'user': request.user}
@@ -115,3 +119,25 @@ def delete_topic(request, topic_id):
     topic.delete()
 
     return redirect('learning_logs_app:topics')
+
+# noinspection PyUnusedLocal
+def custom_404(request, exception):
+    """Custom 404 error page."""
+    return render(request, '404.html', status=404)
+
+def custom_500(request):
+    """Custom 500 error page."""
+
+    exc_type, exc_value, exc_traceback = sys.exc_info()
+    traceback_str = ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+
+    ErrorLog.objects.create(
+        path=request.path,
+        method=request.method,
+        status=500,
+        exception_type=str(exc_type.__name__),
+        exception_message=str(exc_value),
+        traceback=traceback_str,
+        is_resolved=False
+    )
+    return render(request, '500.html', status=500)

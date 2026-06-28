@@ -22,3 +22,6 @@ urlpatterns = [
     path('', include('learning_logs_app.urls')),
     path('user_app/', include('user_app.urls')),
 ]
+
+handler404 = 'learning_logs_app.views.custom_404'
+handler500 = 'learning_logs_app.views.custom_500'

@@ -1,0 +1,14 @@
+{% extends "learning_logs_app/base.html" %}
+
+{% block page_header %}
+    <h1 class="text-danger">Page Not Found</h1>
+{% endblock page_header %}
+
+{% block content %}
+    <h4>Sorry, the page you requested ( {{ request.build_absolute_uri }} ) could not be found.
+        You can <a href="{% url 'learning_logs_app:index' %}">
+            return to the home page
+        </a>
+        if you want.
+    </h4>
+{% endblock content %}
