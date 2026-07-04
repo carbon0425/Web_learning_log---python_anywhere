@@ -21,5 +21,8 @@ urlpatterns = [
     path('delete_entry/<int:entry_id>/', views.delete_entry, name='delete_entry'),
     # Page for deleting a topic
     path('delete_topic/<int:topic_id>/', views.delete_topic, name='delete_topic'),
-    # Page for viewing error logs
+    # Page for viewing feedback
+    path('feedback/', views.feedback, name='feedback'),
+    # Page for submitting feedback
+    path('feedback_ok/', views.feedback_ok, name='feedback_ok'),
 ]

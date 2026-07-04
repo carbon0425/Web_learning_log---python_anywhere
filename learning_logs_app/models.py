@@ -36,3 +36,13 @@ class ErrorLog(models.Model):
 
     def __str__(self):
         return f"{self.exception_type} at {self.path} ({self.status}, {self.timestamp})"
+
+class Feedback(models.Model):
+    """Feedback model to store user feedback."""
+    username = models.CharField(max_length=100)
+    email = models.EmailField(blank=True, null=True)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Feedback from {self.username} at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"

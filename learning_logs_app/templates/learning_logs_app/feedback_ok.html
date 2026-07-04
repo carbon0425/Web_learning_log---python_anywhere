@@ -1,0 +1,11 @@
+{% extends "learning_logs_app/base.html" %}
+{% load bootstrap4 %}
+
+{% block page_header %}
+    <h2 class="text-success">Feedback Posted Correctly</h2>
+{% endblock page_header %}
+
+{% block content %}
+    <h4>Thank you for your feedback! We appreciate your input and will review it carefully.</h4>
+    <h4><a href="{% url 'learning_logs_app:index' %}">Return to the home page</a></h4>
+{% endblock content %}

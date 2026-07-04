@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
 from .models import Topic, Entry, ErrorLog
-from .forms import TopicForm, EntryForm
+from .forms import TopicForm, EntryForm, FeedbackForm
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 import sys
 import traceback
+from django.contrib import messages
 
 def index(request):
     """The home page for Learning Logs."""
@@ -118,6 +119,33 @@ def delete_topic(request, topic_id):
     topic.delete()
 
     return redirect('learning_logs_app:topics')
+
+def feedback(request):
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            feedback_obj = form.save(commit=False)
+            if request.user.is_authenticated:
+                feedback_obj.username = request.user.username
+            feedback_obj.save()
+            messages.success(request, 'Thank you for your feedback!')
+            return redirect('learning_logs_app:feedback_ok')
+        else:
+            messages.error(request, 'There was an error with your submission. Please check the form and try again.')
+    else:
+        if request.user.is_authenticated:
+            initial = {'username': request.user.username}
+            form = FeedbackForm(initial=initial)
+            form.fields['username'].disabled = True
+        else:
+            form = FeedbackForm()
+            form.fields['username'].required = True
+
+    context = {'form': form}
+    return render(request, 'learning_logs_app/feedback.html', context)
+
+def feedback_ok(request):
+    return render(request, 'learning_logs_app/feedback_ok.html')
 
 # noinspection PyUnusedLocal
 def custom_404(request, exception):
