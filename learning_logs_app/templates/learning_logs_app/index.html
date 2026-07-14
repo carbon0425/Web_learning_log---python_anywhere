@@ -24,3 +24,12 @@
     {% endif %}
   </div>
 {% endblock page_header %}
+
+{% block content %}
+    {% if unread %}
+      <div class="alert alert-warning" role="alert">
+        You have {{ unread }} unread notification{{ unread | pluralize }}.
+        <a href="{% url 'learning_logs_app:notifications' %}">View Notifications Here</a>
+      </div>
+    {% endif %}
+{% endblock content %}

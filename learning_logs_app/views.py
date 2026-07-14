@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Topic, Entry, ErrorLog
+from .models import Topic, Entry, ErrorLog, Notification
 from .forms import TopicForm, EntryForm, FeedbackForm
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
@@ -10,26 +10,32 @@ from django.contrib import messages
 
 def index(request):
     """The home page for Learning Logs."""
-    return render(request, 'learning_logs_app/index.html')
+    try:
+        notifications_unread = Notification.objects.filter(user=request.user, is_read=False).order_by('-created_at')
+        unread = notifications_unread.count()
+    except TypeError:
+        unread = 0
+    context = {'unread': unread}
+    return render(request, 'learning_logs_app/index.html', context)
 
 # noinspection PyUnusedLocal
 @login_required
 def topics(request):
     """The page that show all topics."""
-    topics = Topic.objects.filter(owner=request.user).order_by('date_added')
-    context = {'topics': topics, 'user': request.user}
+    topics_obj = Topic.objects.filter(owner=request.user).order_by('date_added')
+    context = {'topics': topics_obj, 'user': request.user}
     return render(request, 'learning_logs_app/topics.html', context)
 
 @login_required
 def topic(request, topic_id):
     """Show a single topic and all its entries."""
-    topic = get_object_or_404(Topic, id=topic_id)
-    if topic.owner != request.user:
+    topic_obj = get_object_or_404(Topic, id=topic_id)
+    if topic_obj.owner != request.user:
         raise Http404
-    entries = topic.entry_set.order_by('-date_added')
+    entries = topic_obj.entry_set.order_by('-date_added')
     quantity = entries.count()
-    create_time = topic.date_added
-    context = {'topic': topic, 'entries': entries,
+    create_time = topic_obj.date_added
+    context = {'topic': topic_obj, 'entries': entries,
                'quantity': quantity, 'create_time': create_time}
     return render(request, 'learning_logs_app/topic.html', context)
 
@@ -43,9 +49,9 @@ def new_topic(request):
         # POST data submitted; process data.
         form = TopicForm(data=request.POST)
         if form.is_valid():
-            new_topic = form.save(commit=False)
-            new_topic.owner = request.user
-            new_topic.save()
+            new_topic_form = form.save(commit=False)
+            new_topic_form.owner = request.user
+            new_topic_form.save()
             return redirect('learning_logs_app:topics')
 
     # Display a blank or invalid form.
@@ -55,7 +61,7 @@ def new_topic(request):
 @login_required
 def new_entry(request, topic_id):
     """Add a new entry for a particular topic."""
-    topic = get_object_or_404(Topic, id=topic_id)
+    topic_obj = get_object_or_404(Topic, id=topic_id)
 
     if request.method != 'POST':
         # No data submitted; create a blank form.
@@ -65,7 +71,7 @@ def new_entry(request, topic_id):
         form = EntryForm(data=request.POST)
         if form.is_valid():
             _new_entry = form.save(commit=False)
-            _new_entry.topic = topic
+            _new_entry.topic = topic_obj
             _new_entry.save()
             return redirect('learning_logs_app:topic', topic_id=topic_id)
 
@@ -77,8 +83,8 @@ def new_entry(request, topic_id):
 def edit_entry(request, entry_id):
     """Edit an existing entry."""
     entry = get_object_or_404(Entry, id=entry_id)
-    topic = entry.topic
-    if topic.owner != request.user:
+    topic_obj = entry.topic
+    if topic_obj.owner != request.user:
         raise Http404
 
     if request.method != 'POST':
@@ -89,10 +95,10 @@ def edit_entry(request, entry_id):
         form = EntryForm(instance=entry, data=request.POST)
         if form.is_valid():
             form.save()
-            return redirect('learning_logs_app:topic', topic_id=topic.id)
+            return redirect('learning_logs_app:topic', topic_id=topic_obj.id)
 
     # Display a blank or invalid form.
-    context = {'entry': entry, 'topic': topic, 'form': form}
+    context = {'entry': entry, 'topic': topic_obj, 'form': form}
     return render(request, 'learning_logs_app/edit_entry.html', context)
 
 
@@ -113,10 +119,10 @@ def delete_entry(request, entry_id):
 @login_required
 def delete_topic(request, topic_id):
     """Delete an existing topic and all its entries."""
-    if topic.owner != request.user:
+    topic_obj = get_object_or_404(Topic, id=topic_id)
+    if topic_obj.owner != request.user:
         raise Http404
-    topic = get_object_or_404(Topic, id=topic_id)
-    topic.delete()
+    topic_obj.delete()
 
     return redirect('learning_logs_app:topics')
 
@@ -168,3 +174,12 @@ def custom_500(request):
         is_resolved=False
     )
     return render(request, '500.html', status=500)
+
+@login_required
+def notifications(request):
+    notifications_obj = Notification.objects.filter(user=request.user).order_by('-created_at')
+    context = {'notifications': notifications_obj}
+    for  obj in notifications_obj:
+        obj.is_read = True
+        obj.save()
+    return render(request, 'learning_logs_app/notifications.html', context)
