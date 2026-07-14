@@ -1,0 +1,22 @@
+{% extends "learning_logs_app\base.html" %}
+{% load bootstrap4 %}
+
+{% block page_header %}
+  <h1>Broadcasting Now</h1>
+{% endblock page_header %}
+
+{%　block content %}
+    <div class="alert alert-warning" style="font-size: 0.9rem;">
+        <strong>Administrative Notice:</strong>
+        This tool broadcasts a system-wide message to all active users.
+        Please ensure the notification content is accurate and finalized before confirming,
+        as this process is irreversible. Proceed with caution.
+        Please be responsible to this website and those who give you trust to administrate the website.
+    </div>
+    <p>Broadcast here.</p>
+    <form method="post" action="{% url 'learning_logs_app:broadcast' %}">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-primary">Send Broadcast Now, with NO Chance  to regret</button>
+    </form>
+    {% endblock content %}

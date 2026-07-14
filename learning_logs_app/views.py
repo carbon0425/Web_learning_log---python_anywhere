@@ -1,12 +1,14 @@
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from .models import Topic, Entry, ErrorLog, Notification
-from .forms import TopicForm, EntryForm, FeedbackForm
+from .forms import TopicForm, EntryForm, FeedbackForm, NotificationForm
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 import sys
 import traceback
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 
 def index(request):
     """The home page for Learning Logs."""
@@ -183,3 +185,23 @@ def notifications(request):
         obj.is_read = True
         obj.save()
     return render(request, 'learning_logs_app/notifications.html', context)
+
+@staff_member_required
+def broadcast(request):
+    if request.method == 'POST':
+        form = NotificationForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data['title']
+            message = form.cleaned_data['message']
+            for user in User.objects.all():
+                Notification.objects.create(
+                    user=user,
+                    title=title,
+                    message=message,
+                )
+            messages.success(request, 'Notification broadcasted successfully!')
+            return redirect('learning_logs_app:index')
+    else:
+        form = NotificationForm()
+
+    return render(request, 'learning_logs_app/broadcast.html', {'form': form})

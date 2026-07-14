@@ -27,4 +27,6 @@ urlpatterns = [
     path('feedback_ok/', views.feedback_ok, name='feedback_ok'),
     # Page for showing notifications
     path('notifications/', views.notifications, name='notifications'),
+    # Page for broadcasting
+    path('hlinakrbcsfrbemgcasrbara/', views.broadcast, name='broadcast'),
 ]

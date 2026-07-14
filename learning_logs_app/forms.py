@@ -25,3 +25,10 @@ class FeedbackForm(forms.ModelForm):
     class Meta:
         model = Feedback
         fields = ['username', 'email', 'message']
+
+class NotificationForm(forms.Form):
+    title = forms.CharField(max_length=100, required=False, label='Title (optional)')
+    message = forms.CharField(widget=forms.Textarea, label='broadcast message')
+
+    class Meta:
+        fields = ['title', 'message']
