@@ -25,22 +25,21 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'learning_logs_app:topics' %}">Topics</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'learning_logs_app:feedback' %}">Seed feedback</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'learning_logs_app:notifications' %}">Notifications</a>
-          </li>
         </ul>
-        
         <ul class="navbar-nav ml-auto">
           {% if user.is_authenticated %}
             <li class="nav-item">
-              <span class="navbar-brand">Hello, {{ user.username }}.</span>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'user_app:logout' %}?next={% url 'learning_logs_app:index' %}">Log
-                out</a>
+              <div>
+                <button class="btn btn-link text-muted btn-sm text-decoration-none" data-toggle="dropdown">
+                  <span class="navbar-brand">Hello, {{ user.username }}.</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                  <a class="dropdown-item text-decoration-none" href="{% url 'learning_logs_app:notifications' %}">Notifications</a>
+                  <a class="dropdown-item text-decoration-none" href="{% url 'learning_logs_app:feedback' %}">Seed Feedback</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item text-danger text-decoration-none" href="{% url 'user_app:logout' %}">Logout</a>
+                </div>
+              </div>
             </li>
           {% else %}
             <li class="nav-item">
