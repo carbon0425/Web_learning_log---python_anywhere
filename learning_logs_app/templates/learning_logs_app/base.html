@@ -34,8 +34,8 @@
                   <span class="navbar-brand">Hello, {{ user.username }}.</span>
                 </button>
                 <div class="dropdown-menu dropdown-menu-right">
-                  <a class="dropdown-item text-decoration-none" href="{% url 'learning_logs_app:notifications' %}">Notifications</a>
-                  <a class="dropdown-item text-decoration-none" href="{% url 'learning_logs_app:feedback' %}">Seed Feedback</a>
+                  <a class="dropdown-item text-decoration-none" href="{% url 'user_app:notifications' %}">Notifications</a>
+                  <a class="dropdown-item text-decoration-none" href="{% url 'user_app:feedback' %}">Seed Feedback</a>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item text-danger text-decoration-none" href="{% url 'user_app:logout' %}">Logout</a>
                 </div>

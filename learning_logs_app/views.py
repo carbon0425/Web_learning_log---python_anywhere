@@ -1,7 +1,10 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.shortcuts import render, redirect
-from .models import Topic, Entry, ErrorLog, Notification
-from .forms import TopicForm, EntryForm, FeedbackForm, NotificationForm
+
+from .models import Topic, Entry, ErrorLog
+from user_app.models import Notification
+from .forms import TopicForm, EntryForm
+from user_app.forms import NotificationForm
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -9,6 +12,8 @@ import sys
 import traceback
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+
+User = get_user_model()
 
 def index(request):
     """The home page for Learning Logs."""
@@ -32,7 +37,7 @@ def topics(request):
 def topic(request, topic_id):
     """Show a single topic and all its entries."""
     topic_obj = get_object_or_404(Topic, id=topic_id)
-    if topic_obj.owner != request.user:
+    if topic_obj.owner != request.user and topic_obj in request.user.friends.all():
         raise Http404
     entries = topic_obj.entry_set.order_by('-date_added')
     quantity = entries.count()
@@ -128,33 +133,6 @@ def delete_topic(request, topic_id):
 
     return redirect('learning_logs_app:topics')
 
-def feedback(request):
-    if request.method == 'POST':
-        form = FeedbackForm(request.POST)
-        if form.is_valid():
-            feedback_obj = form.save(commit=False)
-            if request.user.is_authenticated:
-                feedback_obj.username = request.user.username
-            feedback_obj.save()
-            messages.success(request, 'Thank you for your feedback!')
-            return redirect('learning_logs_app:feedback_ok')
-        else:
-            messages.error(request, 'There was an error with your submission. Please check the form and try again.')
-    else:
-        if request.user.is_authenticated:
-            initial = {'username': request.user.username}
-            form = FeedbackForm(initial=initial)
-            form.fields['username'].disabled = True
-        else:
-            form = FeedbackForm()
-            form.fields['username'].required = True
-
-    context = {'form': form}
-    return render(request, 'learning_logs_app/feedback.html', context)
-
-def feedback_ok(request):
-    return render(request, 'learning_logs_app/feedback_ok.html')
-
 # noinspection PyUnusedLocal
 def custom_404(request, exception):
     """Custom 404 error page."""
@@ -176,15 +154,6 @@ def custom_500(request):
         is_resolved=False
     )
     return render(request, '500.html', status=500)
-
-@login_required
-def notifications(request):
-    notifications_obj = Notification.objects.filter(user=request.user).order_by('-created_at')
-    context = {'notifications': notifications_obj}
-    for  obj in notifications_obj:
-        obj.is_read = True
-        obj.save()
-    return render(request, 'learning_logs_app/notifications.html', context)
 
 @staff_member_required
 def broadcast(request):

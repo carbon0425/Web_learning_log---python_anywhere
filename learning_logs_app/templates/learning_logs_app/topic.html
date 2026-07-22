@@ -17,16 +17,21 @@
       <div class="card mb-3">
         <nav><div class="card-header d-flex justify-content-between align-items-center">
           <h4>{{ entry.date_added | date:"M d, Y H:i" }}</h4>
-          <div>
-            <button class="btn btn-link text-muted btn-sm text-decoration-none" data-toggle="dropdown"><!--suppress HtmlUnknownTag --><h4>...</h4></button>
-            <div class="dropdown-menu dropdown-menu-right">
-              <a class="text-decoration-none dropdown-item" href="{% url 'learning_logs_app:edit_entry' entry.id %}">Edit Entry</a>
-              <a class="dropdown-item text-danger text-decoration-none" href="{% url 'learning_logs_app:delete_entry' entry.id %}">Delete Entry</a>
+          {% if topic_obj.owner == user %}
+            <div>
+              <button class="btn btn-link text-muted btn-sm text-decoration-none" data-toggle="dropdown"><!--suppress HtmlUnknownTag --><h4>...</h4></button>
+              <div class="dropdown-menu dropdown-menu-right">
+                <a class="text-decoration-none dropdown-item" href="{% url 'learning_logs_app:edit_entry' entry.id %}">Edit Entry</a>
+                <a class="dropdown-item text-danger text-decoration-none" href="{% url 'learning_logs_app:delete_entry' entry.id %}">Delete Entry</a>
+              </div>
             </div>
-          </div>
+          {% endif %}
         </div></nav>
         <div class="card-body">
           <p class="card-text">{{ entry.text|linebreaks }}</p>
+          {% if topic_obj.owner != user %}
+            <a href="#" class="btn btn-sm btn-outline-primary">Comment</a>
+          {% endif %}
         </div>
       </div>
     {% endfor %}
