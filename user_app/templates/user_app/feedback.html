@@ -18,7 +18,7 @@
         </div>
     {% endif %}
     <p>We value your feedback! Please fill out the form below to send us your thoughts, suggestions, or any issues you've encountered.</p>
-    <form method="post" action="{% url 'learning_logs_app:feedback' %}">
+    <form method="post" action="{% url 'user_app:feedback' %}">
         {% csrf_token %}
         {% bootstrap_form form %}
         <button type="submit" class="btn btn-primary">Submit Feedback</button>

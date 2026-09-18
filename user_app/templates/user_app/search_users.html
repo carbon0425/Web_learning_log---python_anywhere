@@ -1,0 +1,25 @@
+{% extends "learning_logs_app/base.html" %}
+{% load bootstrap4 %}
+
+{% block page_header %}
+    <h2>Search for users</h2>
+{% endblock page_header %}
+
+{% block content %}
+    <form method="get" action="{% url 'user_app:search_users' %}">
+        <input type="text" name="user_key" value="{{ query }}" placeholder="type to search a user..." class="form-control form-control-lg" />
+    </form>
+    {% if query %}
+
+        <ul class="decoration-none">
+        {% for user in results %}
+            <li><div class="d-flex justify-content-between align-items-center">
+                <h4>{{ user.username }}</h4>
+                <a class="btn btn-outline-primary btn-sm" role="button" href="{% url 'user_app:send_apply' user.id %}">Add Friend</a>
+            </div></li>
+        {% empty %}
+            <h3 class="text-warning">No users found.</h3>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock content %}

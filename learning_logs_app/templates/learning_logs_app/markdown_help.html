@@ -1,0 +1,142 @@
+{% block content %}
+    <div class="container py-5">
+        <!-- Header with question mark help button -->
+        <div class="d-flex align-items-center mb-4">
+            <h1 class="me-3">📝 Markdown Quick Reference</h1>
+            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#helpPanel">
+                <i class="fas fa-question-circle"></i> What is Markdown?
+            </button>
+        </div>
+
+        <!-- Collapsible help panel -->
+        <div class="collapse mb-4" id="helpPanel">
+            <div class="card card-body bg-light">
+                <p><strong>Markdown</strong> is a lightweight markup language that lets you write formatted content using plain text.</p>
+                <ul>
+                    <li>No need to click “bold” or “heading” buttons — just type symbols.</li>
+                    <li>Widely used on GitHub, note‑taking apps, tech docs, and blogs.</li>
+                    <li>The <strong>Learning Log</strong> editor supports it too!</li>
+                </ul>
+                <p class="text-muted small"><i class="fas fa-info-circle"></i> Click the button again or anywhere outside to close this panel.</p>
+            </div>
+        </div>
+
+        <!-- Main syntax table -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 30%;">Markdown Input</th>
+                        <th style="width: 30%;">Rendered Output</th>
+                        <th style="width: 40%;">Explanation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code># Heading 1</code></td>
+                        <td><h5 class="mb-0">Heading 1</h5></td>
+                        <td>Add <code>#</code> before text (more <code>#</code> = smaller heading, up to 6 levels)</td>
+                    </tr>
+                    <tr>
+                        <td><code>**bold**</code></td>
+                        <td><strong>bold</strong></td>
+                        <td>Wrap text with two <code>*</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>*italic*</code></td>
+                        <td><em>italic</em></td>
+                        <td>Wrap text with one <code>*</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>- list item</code></td>
+                        <td>• list item</td>
+                        <td>Start a line with <code>-</code> or <code>*</code> for unordered lists</td>
+                    </tr>
+                    <tr>
+                        <td><code>1. First step</code></td>
+                        <td>1. First step</td>
+                        <td>Start a line with <code>number.</code> for ordered lists</td>
+                    </tr>
+                    <tr>
+                        <td><code>[text](https://link)</code></td>
+                        <td><a href="#">text</a></td>
+                        <td>Create a hyperlink</td>
+                    </tr>
+                    <tr>
+                        <td><code>`inline code`</code></td>
+                        <td><code>inline code</code></td>
+                        <td>Wrap with backticks <code>`</code></td>
+                    </tr>
+                    <tr>
+                        <td><pre><code>```python
+    print("code block")
+    ```</code></pre></td>
+                        <td><pre style="background:#f4f4f4; padding:8px; border-radius:4px;"><code>print("code block")</code></pre></td>
+                        <td>Three backticks + language for a code block</td>
+                    </tr>
+                    <tr>
+                        <td><code>&gt; quoted text</code></td>
+                        <td><blockquote class="border-start ps-3 text-muted">quoted text</blockquote></td>
+                        <td>Start a line with <code>&gt;</code> for blockquotes</td>
+                    </tr>
+                    <tr>
+                        <td><code>---</code></td>
+                        <td><hr class="my-1"></td>
+                        <td>Three hyphens create a horizontal rule</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Bottom tip -->
+        <div class="alert alert-info mt-4" role="alert">
+            <i class="fas fa-lightbulb"></i> <strong>Tip:</strong> In the Learning Log editor, click the <kbd>Preview</kbd> button to see the rendered result in real time.
+        </div>
+
+        <!-- Combined example -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <i class="fas fa-file-code"></i> Combined Example
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Markdown Source</h6>
+                        <pre style="background:#f8f9fa; padding:12px; border-radius:6px; white-space:pre-wrap; word-break:break-all;"><code># Today's Study
+
+    - **Python** functions
+    - *List comprehensions*
+
+    > Key point: `lambda` expressions
+
+    ```python
+    def greet(name):
+        return f"Hello, {name}!"
+    ```</code></pre>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Rendered Output</h6>
+                        <div style="background:#fff; padding:12px; border:1px solid #dee2e6; border-radius:6px;">
+                            <h4>Today's Study</h4>
+                            <ul>
+                                <li><strong>Python</strong> functions</li>
+                                <li><em>List comprehensions</em></li>
+                            </ul>
+                            <blockquote class="border-start ps-3 text-muted">Key point: <code>lambda</code> expressions</blockquote>
+                            <pre style="background:#f4f4f4; padding:8px; border-radius:4px;"><code>def greet(name):
+        return f"Hello, {name}!"</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back to top -->
+        <div class="text-center mt-4">
+            <a href="#" class="text-muted small"><i class="fas fa-arrow-up"></i> Back to top</a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS + Popper (for collapse) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock content %}

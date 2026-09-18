@@ -1,7 +1,10 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.shortcuts import render, redirect
-from .models import Topic, Entry, ErrorLog, Notification
-from .forms import TopicForm, EntryForm, FeedbackForm, NotificationForm
+from django.conf import settings
+from .models import Topic, Entry, ErrorLog
+from user_app.models import Notification
+from .forms import TopicForm, EntryForm
+from user_app.forms import NotificationForm
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -9,6 +12,10 @@ import sys
 import traceback
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+import mistune
+import bleach
+
+User = get_user_model()
 
 def index(request):
     """The home page for Learning Logs."""
@@ -32,9 +39,11 @@ def topics(request):
 def topic(request, topic_id):
     """Show a single topic and all its entries."""
     topic_obj = get_object_or_404(Topic, id=topic_id)
-    if topic_obj.owner != request.user:
+    if topic_obj.owner != request.user and topic_obj in request.user.friends.all():
         raise Http404
     entries = topic_obj.entry_set.order_by('-date_added')
+    for entry in entries:
+        entry.rendered_text = _render_markdown(entry.text)["html"]
     quantity = entries.count()
     create_time = topic_obj.date_added
     context = {'topic': topic_obj, 'entries': entries,
@@ -69,13 +78,21 @@ def new_entry(request, topic_id):
         # No data submitted; create a blank form.
         form = EntryForm()
     else:
-        # POST data submitted; process data.
         form = EntryForm(data=request.POST)
-        if form.is_valid():
-            _new_entry = form.save(commit=False)
-            _new_entry.topic = topic_obj
-            _new_entry.save()
-            return redirect('learning_logs_app:topic', topic_id=topic_id)
+        if 'preview' in request.POST:
+            if form.is_valid():
+                preview_html = _render_markdown(form.cleaned_data["text"])
+                if preview_html["hacker"]:
+                    context = {"raw": preview_html["raw"], "clean": preview_html["html"], "topic": topic_obj}
+                    return render(request, "learning_logs_app/hacker.html", context)
+                context = {'topic': topic, 'form': form, 'preview_html': preview_html["html"]}
+                return render(request, 'learning_logs_app/new_entry.html', context)
+        else:
+            if form.is_valid():
+                _new_entry = form.save(commit=False)
+                _new_entry.topic = topic_obj
+                _new_entry.save()
+                return redirect('learning_logs_app:topic', topic_id=topic_obj.id)
 
     # Display a blank or invalid form.
     context = {'topic': topic, 'form': form}
@@ -93,11 +110,18 @@ def edit_entry(request, entry_id):
         # Initial request; pre-fill form with the current entry.
         form = EntryForm(instance=entry)
     else:
-        # POST data submitted; process data.
-        form = EntryForm(instance=entry, data=request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('learning_logs_app:topic', topic_id=topic_obj.id)
+        if 'preview' in request.POST:
+            form = EntryForm(instance=entry, data=request.POST)
+            if form.is_valid():
+                preview_html = _render_markdown(form.cleaned_data['text'])
+                context = {'entry': entry, 'topic': topic_obj, 'form': form, 'preview_html': preview_html["html"]}
+                return render(request, 'learning_logs_app/edit_entry.html', context)
+        else:
+            # POST data submitted; process data.
+            form = EntryForm(instance=entry, data=request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect('learning_logs_app:topic', topic_id=topic_obj.id)
 
     # Display a blank or invalid form.
     context = {'entry': entry, 'topic': topic_obj, 'form': form}
@@ -128,33 +152,6 @@ def delete_topic(request, topic_id):
 
     return redirect('learning_logs_app:topics')
 
-def feedback(request):
-    if request.method == 'POST':
-        form = FeedbackForm(request.POST)
-        if form.is_valid():
-            feedback_obj = form.save(commit=False)
-            if request.user.is_authenticated:
-                feedback_obj.username = request.user.username
-            feedback_obj.save()
-            messages.success(request, 'Thank you for your feedback!')
-            return redirect('learning_logs_app:feedback_ok')
-        else:
-            messages.error(request, 'There was an error with your submission. Please check the form and try again.')
-    else:
-        if request.user.is_authenticated:
-            initial = {'username': request.user.username}
-            form = FeedbackForm(initial=initial)
-            form.fields['username'].disabled = True
-        else:
-            form = FeedbackForm()
-            form.fields['username'].required = True
-
-    context = {'form': form}
-    return render(request, 'learning_logs_app/feedback.html', context)
-
-def feedback_ok(request):
-    return render(request, 'learning_logs_app/feedback_ok.html')
-
 # noinspection PyUnusedLocal
 def custom_404(request, exception):
     """Custom 404 error page."""
@@ -177,15 +174,6 @@ def custom_500(request):
     )
     return render(request, '500.html', status=500)
 
-@login_required
-def notifications(request):
-    notifications_obj = Notification.objects.filter(user=request.user).order_by('-created_at')
-    context = {'notifications': notifications_obj}
-    for  obj in notifications_obj:
-        obj.is_read = True
-        obj.save()
-    return render(request, 'learning_logs_app/notifications.html', context)
-
 @staff_member_required
 def broadcast(request):
     if request.method == 'POST':
@@ -193,6 +181,8 @@ def broadcast(request):
         if form.is_valid():
             title = form.cleaned_data['title']
             message = form.cleaned_data['message']
+            if not title:
+                title = "Notification"
             for user in User.objects.all():
                 Notification.objects.create(
                     user=user,
@@ -205,3 +195,21 @@ def broadcast(request):
         form = NotificationForm()
 
     return render(request, 'learning_logs_app/broadcast.html', {'form': form})
+
+def _render_markdown(text):
+    hacker = False
+    html = mistune.html(text)
+    clean = bleach.clean(
+        html,
+        tags=settings.ALLOWED_TAGS,
+        attributes=settings.ALLOWED_ATTRIBUTES,
+        strip=True
+    )
+    if html != clean:
+        hacker = True
+    return {"text": text, "raw": html, "html": clean, "hacker": hacker}
+
+def fake_new_entry(request, topic_id):
+    topic_obj = get_object_or_404(Topic, id=topic_id)
+    # 只是为了模拟正常页面，实际上不保存任何数据
+    return render(request, 'learning_logs_app/hacker_fake_normal.html', {'topic': topic_obj})

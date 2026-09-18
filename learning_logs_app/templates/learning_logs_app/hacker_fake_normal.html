@@ -1,0 +1,150 @@
+{% extends "learning_logs_app/base.html" %}
+{% load bootstrap4 %}
+
+{% block page_header %}
+    <h1>New Entry</h1>
+{% endblock page_header %}
+
+{% block content %}
+    <p>Edit your entry below.</p>
+    <form method="post" action="{% url 'learning_logs_app:fake' topic.id %}">
+        {% csrf_token %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs">
+                    <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#code-pane">Code</a></li>
+                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#preview-pane">Preview</a></li>
+                </ul>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane fade show active p-3" id="code-pane">
+                    {{ form.text }}
+                </div>
+                <div class="tab-pane fade p-3" id="preview-pane">
+                    <div class="border rounded p-3 bg-light" style="min-height: 200px;">
+                        <span class="text-muted">Preview will appear here.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Entry</button>
+        <button type="submit" name="preview" class="btn btn-link">Save to preview</button>
+    </form>
+
+    <!-- 干扰效果 -->
+    <div id="glitchContainer" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; display: none;">
+        <div id="glitchText" style="position: absolute; font-family: monospace; font-size: 20px; color: #0f0; background: rgba(0,0,0,0.8); padding: 10px;"></div>
+    </div>
+
+    <script>
+        // ================== 干扰效果脚本 ==================
+        (function() {
+            const glitchContainer = document.getElementById('glitchContainer');
+            const glitchText = document.getElementById('glitchText');
+
+            // 假日志库
+            const fakeLogs = [
+                "[SYSTEM] HACK DETECTED!",
+                "[SYSTEM] Deploying countermeasure...",
+                "[SYSTEM] You cannot escape.",
+                "[SYSTEM] We are watching you.",
+                "[SYSTEM] This page is a trap.",
+                "[SYSTEM] Your input has been logged.",
+                "[SYSTEM] 0xDEADBEEF",
+                "[SYSTEM] Redirecting to... nowhere.",
+                "[SYSTEM] Just kidding, this is all fake.",
+                "[SYSTEM] You've been here for too long.",
+                "[SYSTEM] The system is now self-aware.",
+                "[SYSTEM] Your browser history is being analyzed.",
+                "[SYSTEM] 😈 Welcome to the second layer.",
+            ];
+
+            // 随机获取日志
+            function getRandomLog() {
+                return fakeLogs[Math.floor(Math.random() * fakeLogs.length)];
+            }
+
+            // 显示乱码覆盖
+            function showGlitch() {
+                glitchContainer.style.display = 'block';
+                const isBlack = Math.random() > 0.5;
+                if (isBlack) {
+                    glitchContainer.style.background = '#000';
+                    glitchContainer.style.opacity = '0.9';
+                } else {
+                    glitchContainer.style.background = '#fff';
+                    glitchContainer.style.opacity = '0.95';
+                }
+                // 随机位置显示文本
+                const x = Math.random() * (window.innerWidth - 300);
+                const y = Math.random() * (window.innerHeight - 100);
+                glitchText.style.left = x + 'px';
+                glitchText.style.top = y + 'px';
+                glitchText.textContent = getRandomLog() + ' 0x' + Math.random().toString(16).substring(2, 6);
+                glitchText.style.color = ['#0f0', '#f00', '#ff0', '#0ff'][Math.floor(Math.random() * 4)];
+
+                // 2秒后消失
+                setTimeout(() => {
+                    glitchContainer.style.display = 'none';
+                }, 2000 + Math.random() * 1000);
+            }
+
+            // 第一轮干扰：页面加载后5秒开始
+            setTimeout(() => {
+                showGlitch();
+            }, 3000);
+
+            // 然后每隔随机时间重复
+            setInterval(() => {
+                showGlitch();
+            }, 5000 + Math.random() * 8000);
+
+            // 额外：偶尔全屏闪烁
+            function fullScreenFlash() {
+                const flashDiv = document.createElement('div');
+                flashDiv.style.position = 'fixed';
+                flashDiv.style.top = '0';
+                flashDiv.style.left = '0';
+                flashDiv.style.width = '100%';
+                flashDiv.style.height = '100%';
+                flashDiv.style.background = Math.random() > 0.5 ? '#000' : '#fff';
+                flashDiv.style.zIndex = '10000';
+                flashDiv.style.opacity = '0.3';
+                flashDiv.style.pointerEvents = 'none';
+                document.body.appendChild(flashDiv);
+                setTimeout(() => {
+                    flashDiv.remove();
+                }, 200);
+            }
+            setInterval(() => {
+                if (Math.random() > 0.7) fullScreenFlash();
+            }, 10000);
+
+            // 随机弹出假对话框（模拟系统警告）
+            function fakeAlert() {
+                if (Math.random() > 0.6) {
+                    alert('⚠️ System alert: Unauthorized activity detected. Please stop typing.');
+                }
+            }
+            setInterval(() => {
+                if (Math.random() > 0.8) fakeAlert();
+            }, 15000);
+
+            // 最后：20秒后显示一个永久提示
+            setTimeout(() => {
+                const msg = document.createElement('div');
+                msg.style.position = 'fixed';
+                msg.style.bottom = '20px';
+                msg.style.left = '20px';
+                msg.style.background = '#000';
+                msg.style.color = '#0f0';
+                msg.style.padding = '10px 20px';
+                msg.style.border = '2px solid #0f0';
+                msg.style.zIndex = '10001';
+                msg.textContent = '👾 You thought you escaped? Think again.';
+                document.body.appendChild(msg);
+            }, 20000);
+
+        })();
+    </script>
+{% endblock content %}

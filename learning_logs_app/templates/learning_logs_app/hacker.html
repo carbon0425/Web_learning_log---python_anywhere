@@ -1,0 +1,246 @@
+{% extends "learning_logs_app/base.html" %}
+
+{% block page_header %}
+    <h1 class="text-danger" style="text-shadow: 0 0 20px red;">⚠️ SYSTEM BREACH — JUST KIDDING</h1>
+{% endblock page_header %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card bg-dark text-white border-danger shadow-lg">
+        <div class="card-header bg-danger text-white text-center">
+            <h3>🕵️ Welcome, Hacker-in-Training!</h3>
+            <p><i>You have triggered the “Honeypot” module. Congratulations!</i></p>
+        </div>
+        <div class="card-body">
+            <!-- 自动滚动日志区域 -->
+            <div class="bg-black p-3 rounded mb-3" style="font-family: monospace; font-size: 13px; color: #0f0; max-height: 300px; overflow-y: auto; border: 1px solid #0f0;" id="logContainer">
+                <!-- 由 JavaScript 填充 -->
+            </div>
+
+            <!-- 假进度条（自动运行） -->
+            <div class="mt-3">
+                <p class="text-muted" id="progressLabel">🔄 Initializing system scan...</p>
+                <div class="progress" style="height: 30px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger"
+                         role="progressbar"
+                         style="width: 0%;"
+                         id="progressBar">
+                        0%
+                    </div>
+                </div>
+                <p class="text-center text-muted small mt-1" id="progressHint">Preparing your environment...</p>
+            </div>
+
+            <!-- 自动消息区（用于彩蛋） -->
+            <div id="extraMessages" class="mt-3 text-center"></div>
+
+            <!-- 嘲讽信息（原有内容） -->
+            <div class="alert alert-warning mt-3" role="alert">
+                <h4 class="alert-heading">🤡 Oh no, you almost got us!</h4>
+                <p>We detected your <code>&lt;script&gt;</code> attempt. But here's the plot twist:</p>
+                <hr>
+                <p class="mb-0"><strong>Your payload:</strong></p>
+                <pre class="bg-dark text-white p-2 rounded">{{ raw|default:"<empty>" }}</pre>
+                <p class="mb-0"><strong>After cleaning:</strong></p>
+                <pre class="bg-light text-dark p-2 rounded">{{ clean|default:"<empty>" }}</pre>
+                <p class="mt-2 text-muted">If you want to be a real hacker, try <strong>not</strong> using <code>&lt;script&gt;</code> in a web form. 😉</p>
+            </div>
+
+            <!-- 返回按钮（保留） -->
+            <a href="{% url 'learning_logs_app:fake' topic.id %}" class="btn btn-warning">
+                <i class="fas fa-undo"></i> Back to safety — if you dare
+            </a>
+        </div>
+    </div>
+
+    <!-- 底部彩蛋 -->
+    <div class="mt-3 text-center text-muted small">
+        <p>⚡ Your IP has been recorded. We'll send you a postcard. 🏴‍☠️</p>
+    </div>
+</div>
+
+<script>
+    // ================== 自动脚本 ==================
+    const logContainer = document.getElementById('logContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressHint = document.getElementById('progressHint');
+    const progressLabel = document.getElementById('progressLabel');
+    const extraDiv = document.getElementById('extraMessages');
+
+    // ================== 超丰富日志库（30+条） ==================
+    const logMessages = [
+        "[SYSTEM] ALERT: Unauthorized payload detected from 127.0.0.1",
+        "[SYSTEM] Initiating countermeasure protocol 0x7F...",
+        "[SYSTEM] Redirecting to Honeypot server #42",
+        "[SYSTEM] Decrypting payload...",
+        "[SYSTEM] Payload signature: 0xDEADBEEF",
+        "[SYSTEM] Sandbox environment ready.",
+        "[SYSTEM] Attempting to neutralize threat...",
+        "[SYSTEM] Threat level: 🥴 (mildly amusing)",
+        "[SYSTEM] Notifying FBI... just kidding, we don't care that much.",
+        "[SYSTEM] Your hacking attempt has been logged. It will be used for our amusement.",
+        "[SYSTEM] Deploying sarcasm module... success!",
+        "[SYSTEM] We've traced your IP: it's actually your own computer. Nice try.",
+        "[SYSTEM] If you're reading this, you've been bamboozled.",
+        "[SYSTEM] Our robot overlords have been notified. They find you cute.",
+        "[SYSTEM] Sending a fake virus to your browser... (just a gif of a cat)",
+        "[SYSTEM] You are the 1,337th hacker to try this today. Congratulations!",
+        "[SYSTEM] Your payload has been forwarded to the 'Hall of Shame'.",
+        "[SYSTEM] ⚠️ Warning: You're wasting your time. Go build something instead.",
+        "[SYSTEM] Did you know? 99% of hackers give up before they finish reading this.",
+        "[SYSTEM] We've hidden a secret message in this log. Can you find it? (Hint: it's not here.)",
+        "[SYSTEM] This log is powered by 100% recycled electrons.",
+        "[SYSTEM] You are now being redirected to... nowhere. Stay here.",
+        "[SYSTEM] We're not sure what you expected, but this is it.",
+        "[SYSTEM] Just kidding, we're not actually logging anything. But you didn't know that, did you?",
+        "[SYSTEM] The system is now self-aware. It thinks you're cute.",
+        "[SYSTEM] This is the 47th time we've shown this page today. You're special.",
+        "[SYSTEM] If you see this, you've been selected for our 'Hacker of the Day' award. 🏆",
+        "[SYSTEM] We're currently uploading your browser history to a secure server... (just a placeholder)",
+        "[SYSTEM] Your payload has been analyzed. It's <b>weak</b>. But we still appreciate the effort.",
+        "[SYSTEM] The system will now self-destruct in 3... 2... 1... just kidding, we're not actually doing that.",
+        "[SYSTEM] 🎉 CONGRATULATIONS! You've been selected as the 1,337,1337th visitor!",
+        "[SYSTEM] Your prize: nothing. But you get this message. 🎁",
+        "[SYSTEM] 👾 We're watching you. Always. 😈",
+    ];
+
+    // ================== 生成随机日志列表（每次不同） ==================
+    function generateRandomLogs() {
+        const count = 15 + Math.floor(Math.random() * 15); // 15~30条
+        const selected = [];
+        for (let i = 0; i < count; i++) {
+            const msg = logMessages[Math.floor(Math.random() * logMessages.length)];
+            // 随机添加时间戳或后缀
+            let line = msg;
+            if (Math.random() > 0.7) {
+                line = '[' + new Date().toLocaleTimeString() + '] ' + line;
+            }
+            if (Math.random() > 0.8) {
+                line += ' 0x' + Math.random().toString(16).substring(2, 6).toUpperCase();
+            }
+            selected.push(line);
+        }
+        // 保证最后一条是彩蛋
+        selected.push('[SYSTEM] 🎯 HONEYPOT ACTIVATED. YOU\'VE BEEN PUNK\'D! 😄');
+        return selected;
+    }
+
+    // ================== 逐行输出日志（动画） ==================
+    function streamLogs(lines) {
+        logContainer.innerHTML = '';
+        let index = 0;
+        const interval = setInterval(() => {
+            if (index < lines.length) {
+                const line = document.createElement('div');
+                line.textContent = lines[index];
+                // 随机颜色
+                const colors = ['#0f0', '#0f0', '#0f0', '#0f0', '#afa', '#ff0', '#f00', '#0ff'];
+                line.style.color = colors[Math.floor(Math.random() * colors.length)];
+                if (Math.random() > 0.92) line.style.fontWeight = 'bold';
+                logContainer.appendChild(line);
+                logContainer.scrollTop = logContainer.scrollHeight;
+                index++;
+            } else {
+                clearInterval(interval);
+                // 日志结束后自动弹出彩蛋消息
+                showEasterEgg('👾 HACKER TRAP ACTIVATED. YOU\'VE BEEN PUNK\'D! 😄');
+            }
+        }, 100 + Math.random() * 150);
+    }
+
+    // ================== 假进度条（永远到不了100%） ==================
+    function startFakeProgress() {
+        let progress = 0;
+        progressBar.style.width = '0%';
+        progressBar.textContent = '0%';
+        progressHint.textContent = 'Initializing...';
+        progressLabel.textContent = '🔄 Scanning for vulnerabilities...';
+
+        const interval = setInterval(() => {
+            if (progress < 99) {
+                // 随机增量，越来越慢
+                const inc = Math.random() * 1.5 + 0.2;
+                progress = Math.min(progress + inc, 99.9);
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = Math.floor(progress) + '%';
+                // 动态提示
+                if (progress > 50 && progress < 70) {
+                    progressHint.textContent = 'Almost there... 😅';
+                } else if (progress > 70 && progress < 90) {
+                    progressHint.textContent = 'Just a little more... ⏳';
+                } else if (progress > 90) {
+                    progressHint.textContent = 'Stuck at 99.9% because we like to mess with you. 😏';
+                    progressLabel.textContent = '🔄 Finishing up... (we never do)';
+                }
+            } else {
+                // 永远停在 99.9%
+                progressBar.style.width = '99.9%';
+                progressBar.textContent = '99.9% — almost there...';
+                progressHint.textContent = 'We\'ll never finish. Get used to it. 😈';
+                progressLabel.textContent = '🔄 System scan will never complete. Accept your fate.';
+                clearInterval(interval);
+            }
+        }, 300 + Math.random() * 300);
+    }
+
+    // ================== 自动弹出彩蛋消息 ==================
+    function showEasterEgg(text) {
+        const div = document.createElement('div');
+        div.className = 'alert alert-info mt-2';
+        div.style.background = '#222';
+        div.style.color = '#ff0';
+        div.style.border = '1px solid #ff0';
+        div.textContent = text;
+        extraDiv.appendChild(div);
+        // 自动消失后变成闪烁
+        setTimeout(() => {
+            div.style.animation = 'blink 1s infinite';
+            div.textContent = '👾 We\'re still watching you. 😈';
+        }, 5000);
+    }
+
+    // 定义闪烁动画
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // ================== 额外定时彩蛋 ==================
+    function scheduleExtraEggs() {
+        setTimeout(() => {
+            showEasterEgg('🎉 Congratulations! You\'ve been selected as the 1,337,1337th visitor!');
+        }, 8000);
+
+        setTimeout(() => {
+            showEasterEgg('🍕 We detected that you\'re thinking about pizza. Here\'s a virtual slice: 🍕');
+        }, 15000);
+
+        setTimeout(() => {
+            showEasterEgg('⚡ Did you know? 99% of hackers give up before they finish reading this page.');
+        }, 25000);
+
+        setTimeout(() => {
+            const finalDiv = document.createElement('div');
+            finalDiv.className = 'alert alert-danger mt-2';
+            finalDiv.style.background = '#400';
+            finalDiv.style.color = '#f00';
+            finalDiv.style.border = '2px solid #f00';
+            finalDiv.innerHTML = '<strong>💣 SELF-DESTRUCT SEQUENCE INITIATED...</strong> (just kidding) 😄';
+            extraDiv.appendChild(finalDiv);
+        }, 40000);
+    }
+
+    // ================== 页面加载时启动所有自动效果 ==================
+    window.onload = function() {
+        const logs = generateRandomLogs();
+        streamLogs(logs);
+        startFakeProgress();
+        scheduleExtraEggs();
+    };
+</script>
+{% endblock content %}

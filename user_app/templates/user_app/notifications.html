@@ -1,0 +1,41 @@
+{% extends "learning_logs_app/base.html" %}
+
+{% load bootstrap4 %}
+
+{% block page_header %}
+  <h2>Notifications</h2>
+{% endblock page_header %}
+
+{% block content %}
+  {% if notifications %}
+    {% for noti in notifications %}
+      <div class="card mb-3">
+        <nav>
+          <h4 class="card-header d-flex justify-content-between align-items-center">
+            {{ noti.title }}
+             <small class="text-muted">{{ noti.created_at | date:"M d, Y H:i" }}</small>
+          </h4>
+          {% if noti.action_type == "friend_apply" %}
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4>This is a friend apply. You can accept or reject.</h4>
+                <div>
+                    <a role="button" class="btn btn-outline-success" href="#">Accept</a>
+                    <a role="button" class="btn btn-outline-danger" href="#">Reject</a>
+                </div>
+            </div>
+          {% elif noti.action_type == "apply_check" %}
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4>friend apply from me to <strong>{{ noti.to }}</strong></h4>
+                <span class="navbar-brand">{{ noti.status }}</span>
+            </div>
+          {% endif %}
+        </nav>
+        <div class="card-body">
+          <p class="card-text">{{ noti.message | linebreaks }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <h4>No notifications at this time.</h4>
+  {% endif %}
+{% endblock content %}

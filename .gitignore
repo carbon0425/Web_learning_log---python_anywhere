@@ -1,5 +1,6 @@
-\learning_logs_venv
+\venv
 __pycache__/
 \.idea/
 *.pyc
 db.sqlite3
+\staticfiles

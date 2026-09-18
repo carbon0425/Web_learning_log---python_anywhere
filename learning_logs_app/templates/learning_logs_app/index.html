@@ -3,14 +3,14 @@
 {% block page_header %}
   <div class="jumbotron">
     <h1 class="display-3">Track Your Learning.</h1>
-   
+
     <h2 class="lead">
      Welcome to Learning Log, your personal space for tracking and reflecting on your learning journey.
      Here, you can create topics, record entries, and build a meaningful log of your progress over time.
      We designed this tool to be simple and focused, helping you stay organized and motivated.
      Start by exploring topics or creating your own to capture what you're learning!
     </h2>
-   
+
     {% if not user.is_authenticated %}
       <h4>Get started by creating an account or logging in.</h4>
       <a class="btn btn-secondary btn-lg" href="{% url 'user_app:register' %}"
@@ -29,7 +29,10 @@
     {% if unread %}
       <div class="alert alert-warning" role="alert">
         You have {{ unread }} unread notification{{ unread | pluralize }}.
-        <a href="{% url 'learning_logs_app:notifications' %}">View Notifications Here</a>
+        <a href="{% url 'user_app:notifications' %}">View Notifications Here</a>
       </div>
     {% endif %}
+    <div class="alert alert-danger" role="alert">
+        the new password of all accounts is f7z7a^s)#_##d9shd44)57(+z-=14!#9ctu2=li!5^s@qu-5l1
+    </div>
 {% endblock content %}

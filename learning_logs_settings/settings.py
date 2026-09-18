@@ -24,8 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-ALLOWED_HOSTS = ['CarbonChemistry.pythonanywhere.com']
+DEBUG = True
+ALLOWED_HOSTS = ['carbonchemistry.pythonanywhere.com']
+
 
 
 # Application definition
@@ -46,6 +47,8 @@ INSTALLED_APPS = [
     # Third-party apps
     "bootstrap4",
 ]
+
+AUTH_USER_MODEL = 'user_app.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -131,3 +134,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'user_app:login'
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+ALLOWED_TAGS = [
+    'p', 'br', 'strong', 'em', 'u', 's',
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'ul', 'ol', 'li',
+    'blockquote', 'code', 'pre',
+    'a', 'img'
+]
+
+ALLOWED_ATTRIBUTES = {
+    'a': ['href', 'title'],
+    'img': ['src', 'alt', 'title'],
+}

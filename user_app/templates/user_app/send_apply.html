@@ -1,0 +1,15 @@
+{% extends "learning_logs_app/base.html" %}
+{% load bootstrap4 %}
+
+{% block page_header %}
+    <h2>Send Friend Apply</h2>
+{% endblock page_header %}
+
+{% block content %}
+    <strong>edit your apply here.</strong>
+    <form method="post" action="">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-primary">Send Apply</button>
+    </form>
+{% endblock content %}
